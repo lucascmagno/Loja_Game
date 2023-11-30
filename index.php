@@ -72,6 +72,33 @@ if($sucess == 'true'){
             margin-bottom: 1em;
         }
 
+        .link-comprar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0a0;
+            color: #fff;
+            padding: 0.5em;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 1em;
+        }
+
+        .link-comprar img {
+            width: 1.5em;
+            margin-left: 0.5em;
+        }
+
+        .link-comprar:hover {
+            background-color: #0d0;
+        }
+
+
+        a{
+            text-decoration: none;
+            color: #333;
+        }
+
         @media only screen and (min-width: 600px) {
             main {
                 display: flex;
@@ -109,11 +136,12 @@ if($sucess == 'true'){
 <main>
     <?php foreach ($data as $row):?>
     <div class="card">
-        <img src="https://lucascmagno.github.io/curso-html5-e-css3/img/spider2.jpg" alt="Jogo 1">
+        <img src="https://img.freepik.com/fotos-gratis/vista-da-configuracao-e-do-controlador-de-teclado-para-jogos-de-neon-iluminado_23-2149529357.jpg?w=1380&t=st=1701366882~exp=1701367482~hmac=1d5b6c4aa2a67c9944e8ddee09ce23937d38e9a204fec63ba402056955ec73e1" alt="Jogo 1">
         <h2><?=$row['nome_produto']?></h2>
         <p><?=$row['descricao']?></p>
         <p>Valor: R$ <?=$row['valor_produto']?></p>
         <p>Quantidade em Estoque: <?=$row['quantidade_produto']?></p>
+        <a href="./src/Views/pages/carrinho.php?idproduto=<?=$row['idproduto']?>" class="link-comprar">Comprar<img src="./public/icons/cart3.svg" alt=""></a>
     </div>
     <?php endforeach?>
 

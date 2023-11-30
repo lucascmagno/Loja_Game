@@ -51,5 +51,13 @@
             $stmt->bindValue(':id', $id);
             $stmt->execute();
         }
+
+        public function getProdutoById($id){
+            $sql = "SELECT * FROM produto WHERE idproduto = :id";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->bindValue(':id', $id);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
     }
 ?>

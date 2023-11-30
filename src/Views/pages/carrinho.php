@@ -1,3 +1,12 @@
+<?php
+    include_once '../../Controllers/produtoController.php';
+    $produtoController = new ProdutoController;
+    $idproduto = $_GET['idproduto'] ?? null;
+    $data = $produtoController->getProdutoById($idproduto);
+    print_r($data);
+
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -90,10 +99,12 @@
 
 <main>
     <div class="product">
-        <h2>Nome do Produto</h2>
-        <p>Descrição do produto.</p>
-        <p>Valor: R$ 50,00</p>
-        <button onclick="adicionarAoCarrinho()">Adicionar ao Carrinho</button>
+        <?php foreach ($data as $row => $key): ?>
+            <h2><?=$data['nome_produto']?></h2>
+            <p><?=$data['descricao']?></p>
+            <p>Valor: R$ <?=$data['valor_produto']?></p>
+            <button onclick="adicionarAoCarrinho()">Adicionar ao Carrinho</button>
+        <?php endforeach ?>
     </div>
 
     <div class="cart" id="carrinho">
