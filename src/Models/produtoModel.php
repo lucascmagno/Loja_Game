@@ -1,5 +1,5 @@
 <?php
-    require_once("src/Configurations/connect.php");
+    require_once(__DIR__."/../Configurations/connect.php");
 
     class ProdutoModel extends Connect{
         private $id;

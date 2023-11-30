@@ -1,6 +1,6 @@
 <?php
-    require_once("/src/Models/produtoModel.php");
-    require_once("/src/Controllers/produtoController.php");
+    require_once(__DIR__."/../Configurations/connect.php");
+    require_once(__DIR__."/../Models/produtoModel.php");
 
     class ProdutoController extends Connect{
         private $model;
@@ -19,13 +19,19 @@
         }
 
         public function insertProduto($produto){
-            $sql = "INSERT INTO produto (nome_produto, descricao, valor_produto, quantidade_produto) VALUES (:nome_produto, :descricao, :valor_produto, :quantidade_produto)";
+            $sql = "INSERT INTO produto (nome_produto, valor_produto, quantidade_produto, descricao) VALUES (:nome_produto, :valor_produto, :quantidade_produto, :descricao)";
             $stmt = $this->connection->prepare($sql);
-            $stmt->bindValue(':nome_produto', $produto->getNomeProduto());
-            $stmt->bindValue(':descricao', $produto->getDescricao());
             $stmt->bindValue(':valor_produto', $produto->getValorProduto());
             $stmt->bindValue(':quantidade_produto', $produto->getQuantidadeProduto());
+            $stmt->bindValue(':nome_produto', $produto->getNomeProduto());
+            $stmt->bindValue(':descricao', $produto->getDescricao());
             $stmt->execute();
+
+            if($stmt->rowCount() > 0){
+                header('Location: ../../Views/pages/cadastroProduto.php?sucess=true');
+            }else{
+                header('Location: ../../Views/pages/cadastroProduto.php?sucess=false');
+            }
         }
 
         public function updateProduto($produto){

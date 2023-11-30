@@ -1,6 +1,6 @@
 <?php
-    require_once("src/Configurations/connect.php");
-    require_once("src/Models/clienteModel.php");
+   require_once (__DIR__.'/../Configurations/connect.php');
+   require_once (__DIR__.'/../Models/clienteModel.php');
 
     class ClienteController extends Connect{
         private $model;
@@ -19,18 +19,21 @@
         }
         
         public function insertCliente($cliente){
-            $sql = "INSERT INTO cliente (nome, cpf, email, senha, telefone, endereco, cidade, estado, cep) VALUES (:nome, :cpf, :email, :senha, :telefone, :endereco, :cidade, :estado, :cep)";
+            $sql = "INSERT INTO cliente (nome, email, telefone, senha, cep, endereco) VALUES (:nome, :email, :telefone, :senha, :cep, :endereco )";
             $stmt = $this->connection->prepare($sql);
             $stmt->bindValue(':nome', $cliente->getNome());
-            $stmt->bindValue(':cpf', $cliente->getCpf());
             $stmt->bindValue(':email', $cliente->getEmail());
-            $stmt->bindValue(':senha', $cliente->getSenha());
             $stmt->bindValue(':telefone', $cliente->getTelefone());
-            $stmt->bindValue(':endereco', $cliente->getEndereco());
-            $stmt->bindValue(':cidade', $cliente->getCidade());
-            $stmt->bindValue(':estado', $cliente->getEstado());
+            $stmt->bindValue(':senha', $cliente->getSenha());
             $stmt->bindValue(':cep', $cliente->getCep());
+            $stmt->bindValue(':endereco', $cliente->getEndereco());
             $stmt->execute();
+
+            if($stmt->rowCount() > 0){
+                header('Location: ../../Views/pages/login.php?sucess=true');
+            }else{
+                header('Location: ../../Views/pages/cadastro.php?sucess=false');
+            }
         }
 
         public function updateCliente($cliente){
@@ -54,6 +57,23 @@
             $stmt = $this->connection->prepare($sql);
             $stmt->bindValue(':id', $id);
             $stmt->execute();
+        }
+
+        public function login($usuario, $senha){
+            $sql = "SELECT * FROM cliente WHERE nome = :usuario AND senha = :senha";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->bindValue(':usuario', $usuario);
+            $stmt->bindValue(':senha', $senha);
+            $stmt->execute();
+
+            if($stmt->rowCount() > 0){
+                session_start();
+                $_SESSION['usuario'] = $usuario;
+                $_SESSION['senha'] = $senha;
+                header('Location: /index.php?sucess=true');
+            }else{
+                header('Location: ../../Views/pages/login.php?sucess=false');
+            }
         }
     }
 
