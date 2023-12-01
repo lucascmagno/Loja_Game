@@ -1,10 +1,10 @@
 <?php
-    include_once '../../Controllers/produtoController.php';
-    $produtoController = new ProdutoController;
-    $idproduto = $_GET['idproduto'] ?? null;
-    $data = $produtoController->getProdutoById($idproduto);
-    print_r($data);
+include_once '../../Controllers/produtoController.php';
+$produtoController = new ProdutoController;
+$idproduto = $_GET['idproduto'] ?? null;
+$data = $produtoController->getProdutoById($idproduto);
 
+$idusuario = $_SESSION['idusuario'] ?? null;
 ?>
 
 <!DOCTYPE html>
@@ -42,6 +42,9 @@
 
         main {
             padding: 1em;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
         }
 
         .product {
@@ -52,6 +55,7 @@
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
+            max-width: 300px;
         }
 
         .cart {
@@ -62,6 +66,7 @@
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
+            max-width: 300px;
         }
 
         form {
@@ -83,6 +88,28 @@
             border: none;
             cursor: pointer;
         }
+
+        #listaCarrinho {
+            list-style: none;
+            padding: 0;
+        }
+
+        #listaCarrinho li {
+            margin-bottom: 0.5em;
+        }
+
+        #totalCarrinho {
+            margin-bottom: 0.5em;
+        }
+
+        #botaoCompra {
+            display: none; /* Inicialmente, o botão de compra fica oculto */
+            padding: 0.5em 1em;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -98,24 +125,35 @@
 </nav>
 
 <main>
-    <div class="product">
-        <?php foreach ($data as $row => $key): ?>
-            <h2><?=$data['nome_produto']?></h2>
-            <p><?=$data['descricao']?></p>
-            <p>Valor: R$ <?=$data['valor_produto']?></p>
-            <button onclick="adicionarAoCarrinho()">Adicionar ao Carrinho</button>
-        <?php endforeach ?>
-    </div>
+    <?php if (!empty($data)): ?>
+        <div class="product">
+            <h2 id="nome"><?= $data['nome_produto'] ?></h2>
+            <p><?= $data['descricao'] ?></p>
+            <p id="valor">Valor: R$ <?= $data['valor_produto'] ?></p>
+            <form action="processar_compra.php" method="post">
+                <input type="hidden" name="id_produto" value="<?= $data['idproduto'] ?>">
+                <button type="button" onclick="adicionarAoCarrinho()">Adicionar ao Carrinho</button>
+            </form>
+        </div>
+    <?php else: ?>
+        <p>Nenhum produto encontrado.</p>
+    <?php endif; ?>
 
     <div class="cart" id="carrinho">
         <h2>Carrinho</h2>
         <ul id="listaCarrinho"></ul>
-        <form id="formFrete">
+        <form id="formFrete" method="post" action="../php/insertCompra.php">
             <label for="cep">Calcular Frete:</label>
             <input type="text" id="cep" name="cep" placeholder="Digite o CEP" required>
             <button type="button" onclick="calcularFrete()">Calcular</button>
+            <input type="text" disabled id="totalCarrinho" name="valor_compra" value="<?=$data['valor_produto']+30.00?>" >
+            
+            <input type="hidden" name="idproduto" value="<?= $data['idproduto'] ?>">
+            <input type="hidden" name="idusuario" value="<?= $idusuario ?>">
+            
+            <!-- Botão de compra -->
+            <button id="botaoCompra" onclick="comprarProduto()" type="submit">Comprar Agora</button>
         </form>
-        <p id="totalCarrinho">Total do Carrinho: R$ 0,00</p>
     </div>
 </main>
 
@@ -124,12 +162,12 @@
 
     function adicionarAoCarrinho() {
         // Lógica simulada para adicionar o produto ao carrinho
-        var nomeProduto = "Nome do Produto";
-        var valorProduto = 50.00;
+        var nomeProduto = document.getElementById("nome").textContent;
+        var valorProduto = document.getElementById("valor").textContent.split("R$ ")[1];
 
         // Crie um item do carrinho
         var itemCarrinho = document.createElement("li");
-        itemCarrinho.textContent = nomeProduto + " - R$ " + valorProduto.toFixed(2);
+        itemCarrinho.textContent = nomeProduto + " - R$ " + parseFloat(valorProduto).toFixed(2);
 
         // Adicione o item à lista do carrinho
         var listaCarrinho = document.getElementById("listaCarrinho");
@@ -138,6 +176,9 @@
         // Atualize o total do carrinho ao adicionar um novo produto
         atualizarTotalCarrinho();
         alert("Produto adicionado ao carrinho!");
+
+        // Exiba o botão de compra após adicionar o produto ao carrinho
+        exibirBotaoCompra();
     }
 
     function calcularFrete() {
@@ -150,21 +191,38 @@
 
         // Atualize o total do carrinho ao calcular o frete
         atualizarTotalCarrinho();
+
+        // Exiba o botão de compra após calcular o frete
+        exibirBotaoCompra();
     }
 
-    function atualizarTotalCarrinho() {
-        // Calcule o total do carrinho somando os preços dos produtos e o frete
+    function exibirBotaoCompra() {
+        // Exibe o botão de compra quando
+        var botaoCompra = document.getElementById("botaoCompra");
+        botaoCompra.style.display = "block";
+    }
+
+    function comprarProduto() {
+        // Lógica simulada para a compra do produto
+        var listaCarrinho = document.getElementById("listaCarrinho");
         var totalProdutos = calcularTotalProdutos();
         var totalCarrinho = totalProdutos + freteFixo;
 
-        // Atualize a exibição do total do carrinho
-        var totalCarrinhoElement = document.getElementById("totalCarrinho");
-        totalCarrinhoElement.textContent = "Total do Carrinho: R$ " + totalCarrinho.toFixed(2);
+        // Aqui você pode enviar os dados para o backend para processar a compra
+        alert("Produto comprado com sucesso!\nTotal: R$ " + totalCarrinho.toFixed(2));
+
+        // Limpar o carrinho após a compra
+        listaCarrinho.innerHTML = "";
+
+        // Atualizar o total do carrinho
+        atualizarTotalCarrinho();
+
+        // Ocultar o botão de compra após a conclusão da compra
+        var botaoCompra = document.getElementById("botaoCompra");
+        botaoCompra.style.display = "none";
     }
 
     function calcularTotalProdutos() {
-        // Lógica simulada para calcular o total dos produtos no carrinho
-        // Percorra os itens do carrinho e some os preços dos produtos
         var listaCarrinho = document.getElementById("listaCarrinho");
         var itensCarrinho = listaCarrinho.getElementsByTagName("li");
         var totalProdutos = 0;
@@ -177,7 +235,19 @@
 
         return totalProdutos;
     }
+
+    function atualizarTotalCarrinho() {
+        var totalProdutos = calcularTotalProdutos();
+        var totalCarrinho = totalProdutos + freteFixo;
+
+        var totalCarrinhoElement = document.getElementById("totalCarrinho");
+        totalCarrinhoElement.value = totalCarrinho.toFixed(2);
+    }
 </script>
 
 </body>
 </html>
+
+
+
+

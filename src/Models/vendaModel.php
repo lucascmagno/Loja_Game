@@ -1,5 +1,5 @@
 <?php
-    require_once("src/Configurations/connect.php");
+    require_once '../../Configurations/connect.php';
 
     class VendaModel extends Connect{
         private $id;

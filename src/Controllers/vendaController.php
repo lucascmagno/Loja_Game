@@ -1,6 +1,6 @@
 <?php
-    require_once("src/Configurations/connect.php");
-    require_once("src/Models/vendaModel.php");
+    require_once '../../Configurations/connect.php';
+    require_once '../../Models/vendaModel.php';
 
     class VendaController extends Connect{
         private $model;
@@ -19,13 +19,18 @@
         }
 
         public function insertVenda($venda){
-            $sql = "INSERT INTO venda (id_cliente, id_produto, valor_total, data_venda) VALUES (:id_cliente, :id_produto, :valor_total, :data_venda)";
+            $sql = "INSERT INTO compra (cliente_idcliente, produto_idproduto, valor_compra, data_compra) VALUES (:id_cliente, :id_produto, :valor_total, NOW())";
             $stmt = $this->connection->prepare($sql);
             $stmt->bindValue(':id_cliente', $venda->getIdCliente());
             $stmt->bindValue(':id_produto', $venda->getIdProduto());
             $stmt->bindValue(':valor_total', $venda->getValorTotal());
-            $stmt->bindValue(':data_venda', $venda->getDataVenda());
             $stmt->execute();
+
+            if($stmt->rowCount() > 0){
+                header('Location: ../../Views/pages/carrinho.php?sucess=true');
+            }else{
+                header('Location: ../../Views/pages/carrinho.php?sucess=false');
+            }
         }
 
         public function updateVenda($venda){

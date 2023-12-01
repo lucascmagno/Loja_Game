@@ -70,6 +70,7 @@
                 session_start();
                 $_SESSION['usuario'] = $usuario;
                 $_SESSION['senha'] = $senha;
+                $_SESSION['idusuario'] = $stmt->fetch(PDO::FETCH_ASSOC)['id'];
                 header('Location: /index.php?sucess=true');
             }else{
                 header('Location: ../../Views/pages/login.php?sucess=false');
